@@ -1,0 +1,665 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Delete - {{ employee.get_full_name }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            animation: slideInUp 0.5s ease;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .confirmation-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            border-left: 6px solid #dc3545;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .confirmation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #dc3545, #c82333);
+        }
+
+        .warning-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .header {
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            color: #dc3545;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        .warning-text {
+            background: #fff3f3;
+            border: 2px solid #f8d7da;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: left;
+        }
+
+        .warning-text h3 {
+            color: #dc3545;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .warning-text ul {
+            color: #721c24;
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .warning-text li {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .employee-info {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+            border: 2px dashed #dee2e6;
+            text-align: left;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #333;
+            font-size: 1rem;
+        }
+
+        .employee-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            margin: 0 auto 15px;
+            border: 4px solid white;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+
+        .employee-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .employee-role {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .consequences {
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .consequences h4 {
+            color: #856404;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .consequences ul {
+            color: #856404;
+            margin-left: 20px;
+        }
+
+        .consequences li {
+            margin-bottom: 5px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 160px;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
+        }
+
+        .btn-cancel {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            color: white;
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-cancel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+            box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3);
+        }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(23, 162, 184, 0.4);
+        }
+
+        .security-check {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .security-check h4 {
+            color: #dc3545;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .confirmation-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .confirmation-input:focus {
+            outline: none;
+            border-color: #dc3545;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+        }
+
+        .input-hint {
+            font-size: 0.85rem;
+            color: #666;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .countdown {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        .countdown-number {
+            color: #dc3545;
+            font-weight: 700;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .confirmation-card {
+                padding: 25px;
+            }
+
+            .warning-icon {
+                font-size: 4rem;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading State */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Shake animation for invalid input */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.5s ease;
+        }
+
+        /* Success state for confirmation */
+        .confirmed {
+            border-color: #28a745 !important;
+            background-color: #f8fff9 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="confirmation-card">
+            <div class="warning-icon">⚠️</div>
+            
+            <div class="header">
+                <h1>Confirm Deletion</h1>
+                <p>You are about to permanently delete an employee record</p>
+            </div>
+
+            <div class="warning-text">
+                <h3>🚨 Critical Action Required</h3>
+                <p>This action will <strong>permanently delete</strong> the following employee record from the system. This cannot be undone.</p>
+                <ul>
+                    <li>All employee data will be permanently lost</li>
+                    <li>This action is irreversible</li>
+                    <li>Backups may not contain recent changes</li>
+                    <li>System logs will record this deletion</li>
+                </ul>
+            </div>
+
+            <!-- Employee Information -->
+            <div class="employee-info">
+                <div class="employee-avatar">
+                    {{ employee.firstname|first|upper }}{{ employee.lastname|first|upper }}
+                </div>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div class="employee-name">{{ employee.get_full_name }}</div>
+                    <div class="employee-role">{{ employee.role }}</div>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Employee ID</span>
+                        <span class="info-value">{{ employee.employee_id|default:"Not assigned" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Department</span>
+                        <span class="info-value">{{ employee.department }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email</span>
+                        <span class="info-value">{{ employee.email }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Join Date</span>
+                        <span class="info-value">{{ employee.formatted_join_date }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Status</span>
+                        <span class="info-value" style="color: {% if employee.status == 'Active' %}#28a745{% else %}#dc3545{% endif %};">
+                            {{ employee.status }}
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Years of Service</span>
+                        <span class="info-value">{{ employee.get_years_of_service|default:"0" }} years</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="consequences">
+                <h4>📋 Consequences of Deletion</h4>
+                <ul>
+                    <li>Employee record will be permanently removed from database</li>
+                    <li>All associated data will be deleted</li>
+                    <li>This action will be logged for audit purposes</li>
+                    <li>Cannot be recovered through normal means</li>
+                </ul>
+            </div>
+
+            <!-- Security Check -->
+            <div class="security-check">
+                <h4>🔒 Security Verification</h4>
+                <p style="color: #666; margin-bottom: 15px; text-align: center;">
+                    Type <strong>"DELETE"</strong> in the box below to confirm this action
+                </p>
+                <input type="text" 
+                       id="confirmationInput" 
+                       class="confirmation-input" 
+                       placeholder="Type DELETE to confirm" 
+                       autocomplete="off">
+                <div class="input-hint">
+                    This helps prevent accidental deletions
+                </div>
+                <div class="countdown">
+                    Action will be available in: <span class="countdown-number" id="countdown">5</span> seconds
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <form method="post" id="deleteForm">
+                {% csrf_token %}
+                <div class="action-buttons">
+                    <button type="submit" 
+                            class="btn btn-delete" 
+                            id="deleteBtn" 
+                            disabled>
+                        <span id="deleteText">🗑️ Delete Employee</span>
+                        <span id="deleteSpinner" class="spinner" style="display: none;"></span>
+                    </button>
+                    
+                    <a href="{% url 'employee_detail' employee.id %}" class="btn btn-back">
+                        👁️ View Details
+                    </a>
+                    
+                    <a href="{% url 'employee_list' %}" class="btn btn-cancel">
+                        ← Back to List
+                    </a>
+                </div>
+            </form>
+
+            <!-- Additional Safety Note -->
+            <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #e9ecef;">
+                <p style="color: #666; font-size: 0.9rem; text-align: center;">
+                    <strong>Note:</strong> Consider deactivating the employee instead of deleting if you might need this data in the future.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const confirmationInput = document.getElementById('confirmationInput');
+            const deleteBtn = document.getElementById('deleteBtn');
+            const deleteText = document.getElementById('deleteText');
+            const deleteSpinner = document.getElementById('deleteSpinner');
+            const deleteForm = document.getElementById('deleteForm');
+            const countdownElement = document.getElementById('countdown');
+            
+            let countdown = 5;
+            let countdownInterval;
+
+            // Start countdown
+            function startCountdown() {
+                countdownInterval = setInterval(() => {
+                    countdown--;
+                    countdownElement.textContent = countdown;
+                    
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        confirmationInput.disabled = false;
+                        confirmationInput.focus();
+                        countdownElement.style.display = 'none';
+                    }
+                }, 1000);
+            }
+
+            // Initial countdown
+            startCountdown();
+            confirmationInput.disabled = true;
+
+            // Confirmation input validation
+            confirmationInput.addEventListener('input', function() {
+                const value = this.value.trim().toUpperCase();
+                const isValid = value === 'DELETE';
+                
+                if (isValid) {
+                    this.classList.add('confirmed');
+                    this.classList.remove('shake');
+                    deleteBtn.disabled = false;
+                } else {
+                    this.classList.remove('confirmed');
+                    deleteBtn.disabled = true;
+                    
+                    if (value && !isValid) {
+                        this.classList.add('shake');
+                    }
+                }
+            });
+
+            // Form submission with enhanced confirmation
+            deleteForm.addEventListener('submit', function(e) {
+                const value = confirmationInput.value.trim().toUpperCase();
+                
+                if (value !== 'DELETE') {
+                    e.preventDefault();
+                    showError('Please type "DELETE" to confirm deletion.');
+                    return;
+                }
+
+                // Additional confirmation
+                if (!confirm('FINAL WARNING: This will permanently delete {{ employee.get_full_name }}. Are you absolutely sure?')) {
+                    e.preventDefault();
+                    return;
+                }
+
+                // Show loading state
+                deleteText.textContent = 'Deleting...';
+                deleteSpinner.style.display = 'inline-block';
+                deleteBtn.classList.add('loading');
+                
+                // Prevent double submission
+                deleteBtn.disabled = true;
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Escape key to cancel
+                if (e.key === 'Escape') {
+                    window.location.href = '{% url 'employee_detail' employee.id %}';
+                }
+                
+                // Ctrl+Enter to submit if confirmed
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    if (!deleteBtn.disabled) {
+                        deleteForm.requestSubmit();
+                    }
+                }
+            });
+
+            // Show error message
+            function showError(message) {
+                // Remove existing error
+                const existingError = document.querySelector('.error-message');
+                if (existingError) {
+                    existingError.remove();
+                }
+
+                // Create error element
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.style.cssText = `
+                    background: #f8d7da;
+                    color: #721c24;
+                    padding: 12px 15px;
+                    border-radius: 8px;
+                    margin: 15px 0;
+                    border-left: 4px solid #dc3545;
+                    animation: slideInUp 0.3s ease;
+                `;
+                errorDiv.textContent = message;
+
+                // Insert before the form
+                deleteForm.parentNode.insertBefore(errorDiv, deleteForm);
+
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    errorDiv.style.opacity = '0';
+                    errorDiv.style.transform = 'translateY(-10px)';
+                    setTimeout(() => errorDiv.remove(), 300);
+                }, 5000);
+            }
+
+            // Add safety delay for delete button
+            setTimeout(() => {
+                deleteBtn.style.opacity = '1';
+            }, 5000);
+
+            // Prevent accidental back button
+            window.addEventListener('beforeunload', function(e) {
+                if (confirmationInput.value.trim().toUpperCase() === 'DELETE') {
+                    e.preventDefault();
+                    e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+                    return e.returnValue;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
